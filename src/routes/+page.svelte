@@ -165,7 +165,7 @@
                 class="btn btn-neutral"
                 on:click={() => { getPosition = true }}
             >
-                Get geolocation
+                Get Device Position
             </button>
 
             <!-- <Geolocation> tag is used to access the Geolocation API -->
