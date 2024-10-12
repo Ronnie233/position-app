@@ -143,6 +143,36 @@
      * on a remote server. Try this by replacing 'melbourne.geojson' with
      * 'https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/melbourne.geojson'
      */
+    /**
+     * Generates 15 random points around the current location within a 200-meter radius
+     * @param {number} lat - Latitude of the current location
+     * @param {number} lng - Longitude of the current location
+     * @returns {Array} Array of objects containing lat and lng of random points
+     */
+    function generateRandomPoints(lat, lng) {
+        const points = []
+        const earthRadius = 6371000 // Earth's radius in meters
+        const maxDistance = 200 // Maximum distance in meters
+
+        for (let i = 0; i < 15; i++) {
+            // Generate random distance and angle
+            const randomDistance = Math.random() * maxDistance
+            const randomAngle = Math.random() * 2 * Math.PI
+
+            // Calculate offset in latitude and longitude
+            const latOffset = (randomDistance / earthRadius) * (180 / Math.PI)
+            const lngOffset = (randomDistance / earthRadius) * (180 / Math.PI) / Math.cos(lat * Math.PI / 180)
+
+            // Calculate new lat and lng
+            const newLat = lat + latOffset * Math.cos(randomAngle)
+            const newLng = lng + lngOffset * Math.sin(randomAngle)
+
+            points.push({ lat: newLat, lng: newLng })
+        }
+
+        return points
+    }
+
     onMount(async () => {
         const response = await fetch('melbourne.geojson')
         geojsonData = await response.json()
@@ -228,7 +258,7 @@
         </div>
 
         <div class="col-span-3 md:col-span-1 text-center">
-            <h1 class="font-bold">Toggle Melbourne Suburbs</h1>
+            <h1 class="font-bold">Toggllllle Melbourne Suburbs</h1>
 
             <button
                 class="btn btn-neutral"
@@ -327,6 +357,7 @@
             </Marker>
         {/each}
     </MapLibre>
+
 </div>
 
 <!-- Optionally, you can have a <style> tag for CSS at the end, but with TailwindCSS it is usually not necessary -->
