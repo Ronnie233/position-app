@@ -75,11 +75,17 @@
     let watchPosition = false
     let watchedPosition = {}
     let randomPoints = []
+    let lastUpdateTime = 0
+    const UPDATE_INTERVAL = 20 * 60 * 1000 // 20 minutes in milliseconds
 
     // Reactive statement to generate random points when watchedPosition changes
     $: if (watchedPosition.coords) {
-        const { latitude, longitude } = watchedPosition.coords
-        randomPoints = generateRandomPoints(latitude, longitude)
+        const currentTime = Date.now()
+        if (currentTime - lastUpdateTime >= UPDATE_INTERVAL) {
+            const { latitude, longitude } = watchedPosition.coords
+            randomPoints = generateRandomPoints(latitude, longitude)
+            lastUpdateTime = currentTime
+        }
     }
 
     /**
