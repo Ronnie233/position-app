@@ -198,6 +198,18 @@
             console.error('Error loading GeoJSON data:', error)
         }
     })
+
+    let landmarkFeatures = []
+
+    onMount(async () => {
+        try {
+            const response = await fetch('/landmark.geojson')
+            const data = await response.json()
+            landmarkFeatures = data.features
+        } catch (error) {
+            console.error('Error loading landmark GeoJSON data:', error)
+        }
+    })
 </script>
 
 <!-- Everything after <script> will be HTML for rendering -->
@@ -387,6 +399,23 @@
                     openOn="hover"
                     offset={[0, -10]}>
                     <div class="text-sm">{name}</div>
+                </Popup>
+            </Marker>
+        {/each}
+
+        {#each landmarkFeatures as feature}
+            <Marker
+                lngLat={feature.geometry.coordinates}
+                class="w-4 h-4 rounded-full bg-red-500"
+            >
+                <Popup
+                    openOn="hover"
+                    offset={[0, -10]}
+                >
+                    <div class="text-sm">
+                        <strong>Landmark Tower</strong><br>
+                        {feature.properties.feature_na || 'Unnamed Landmark'}
+                    </div>
                 </Popup>
             </Marker>
         {/each}
