@@ -128,6 +128,7 @@
 
     let showGeoJSON = false
     let geojsonData
+    let randomPoints = []
 
     /**
      * onMount is executed immediately after the component is mounted, it can be
@@ -167,15 +168,28 @@
             const newLat = lat + latOffset * Math.cos(randomAngle)
             const newLng = lng + lngOffset * Math.sin(randomAngle)
 
-            points.push({ lat: newLat, lng: newLng })
+            points.push({
+                lngLat: { lng: newLng, lat: newLat },
+                label: `Random ${i + 1}`,
+                name: `Random point ${i + 1}`
+            })
         }
 
         return points
     }
 
     onMount(async () => {
-        const response = await fetch('melbourne.geojson')
-        geojsonData = await response.json()
+        try {
+            const response = await fetch('melbourne.geojson')
+            geojsonData = await response.json()
+
+            if (markers.length > 0) {
+                const centerPoint = markers[0].lngLat
+                randomPoints = generateRandomPoints(centerPoint.lat, centerPoint.lng)
+            }
+        } catch (error) {
+            console.error('Error loading GeoJSON data:', error)
+        }
     })
 </script>
 
@@ -258,13 +272,13 @@
         </div>
 
         <div class="col-span-3 md:col-span-1 text-center">
-            <h1 class="font-bold">Toggllllle Melbourne Suburbs</h1>
+            <h1 class="font-bold">Toggle Melbourne Suburbs</h1>
 
             <button
                 class="btn btn-neutral"
                 on:click={() => { showGeoJSON = !showGeoJSON }}
             >
-                Toggle
+                {showGeoJSON ? 'Hide' : 'Show'} Suburbs
             </button>
         </div>
     </div>
@@ -353,6 +367,19 @@
                     openOn="hover"
                     offset={[0, -10]}>
                     <div class="text-lg font-bold">{name}</div>
+                </Popup>
+            </Marker>
+        {/each}
+
+        {#each randomPoints as { lngLat, name }, i (i)}
+            <Marker
+                {lngLat}
+                class="w-4 h-4 rounded-full bg-purple-500"
+            >
+                <Popup
+                    openOn="hover"
+                    offset={[0, -10]}>
+                    <div class="text-sm">{name}</div>
                 </Popup>
             </Marker>
         {/each}
