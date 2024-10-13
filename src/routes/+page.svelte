@@ -200,6 +200,7 @@
     })
 
     let landmarkFeatures = []
+    let hoveredLandmark = null
 
     onMount(async () => {
         try {
@@ -210,6 +211,14 @@
             console.error('Error loading landmark GeoJSON data:', error)
         }
     })
+
+    function handleMouseEnter(feature) {
+        hoveredLandmark = feature.properties.feature_na || 'Unnamed Landmark'
+    }
+
+    function handleMouseLeave() {
+        hoveredLandmark = null
+    }
 </script>
 
 <!-- Everything after <script> will be HTML for rendering -->
@@ -406,21 +415,18 @@
         {#each landmarkFeatures as feature}
             <Marker
                 lngLat={feature.geometry.coordinates}
-                class="w-4 h-4 rounded-full bg-red-500"
-            >
-                <Popup
-                    openOn="hover"
-                    offset={[0, -10]}
-                >
-                    <div class="text-sm">
-                        <strong>Landmark Tower</strong><br>
-                        {feature.properties.feature_na || 'Unnamed Landmark'}
-                    </div>
-                </Popup>
-            </Marker>
+                class="w-4 h-4 rounded-full bg-red-500 cursor-pointer"
+                on:mouseenter={() => handleMouseEnter(feature)}
+                on:mouseleave={handleMouseLeave}
+            />
         {/each}
     </MapLibre>
 
+    {#if hoveredLandmark}
+        <div class="absolute top-4 left-4 bg-white p-2 rounded shadow">
+            {hoveredLandmark}
+        </div>
+    {/if}
 </div>
 
 <!-- Optionally, you can have a <style> tag for CSS at the end, but with TailwindCSS it is usually not necessary -->
