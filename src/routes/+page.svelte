@@ -201,14 +201,19 @@
 
     let landmarkFeatures = []
     let hoveredLandmark = null
+    let debugInfo = ''
 
     onMount(async () => {
         try {
             const response = await fetch('/landmark.geojson')
             const data = await response.json()
             landmarkFeatures = data.features
+            debugInfo = `Loaded ${landmarkFeatures.length} features`
+            console.log('First landmark feature:', landmarkFeatures[0])
+            console.log('Coordinates of first feature:', landmarkFeatures[0]?.geometry?.coordinates)
         } catch (error) {
             console.error('Error loading landmark GeoJSON data:', error)
+            debugInfo = `Error: ${error.message}`
         }
     })
 
@@ -322,8 +327,15 @@
         standardControls
         style="https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
         bind:bounds
-        zoom={14}
+        zoom={10}
     >
+        <Marker
+            lngLat={[144.97, -37.81]}
+            class="w-8 h-8 rounded-full bg-blue-500 cursor-pointer"
+        />
+
+        <!-- ... other markers ... -->
+
         <!-- Custom control buttons -->
         <Control class="flex flex-col gap-y-2">
             <ControlGroup>
@@ -412,7 +424,7 @@
             </Marker>
         {/each}
 
-        {#each landmarkFeatures as feature}
+        {#each landmarkFeatures as feature (feature.id)}
             <Marker
                 lngLat={feature.geometry.coordinates}
                 class="w-4 h-4 rounded-full bg-red-500 cursor-pointer"
@@ -421,6 +433,10 @@
             />
         {/each}
     </MapLibre>
+
+    <div class="absolute top-4 right-4 bg-white p-2 rounded shadow">
+        Debug: {debugInfo}
+    </div>
 
     {#if hoveredLandmark}
         <div class="absolute top-4 left-4 bg-white p-2 rounded shadow">
