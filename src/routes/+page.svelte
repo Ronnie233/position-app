@@ -74,6 +74,13 @@
 
     let watchPosition = false
     let watchedPosition = {}
+    let randomPoints = []
+
+    // Reactive statement to generate random points when watchedPosition changes
+    $: if (watchedPosition.coords) {
+        const { latitude, longitude } = watchedPosition.coords
+        randomPoints = generateRandomPoints(latitude, longitude)
+    }
 
     /**
      * $: indicates a reactive statement, meaning that this block of code is
@@ -128,7 +135,6 @@
 
     let showGeoJSON = false
     let geojsonData
-    let randomPoints = []
 
     /**
      * onMount is executed immediately after the component is mounted, it can be
@@ -145,7 +151,7 @@
      * 'https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/melbourne.geojson'
      */
     /**
-     * Generates 15 random points around the current location within a 200-meter radius
+     * Generates 15 random points around the given location within a 200-meter radius
      * @param {number} lat - Latitude of the current location
      * @param {number} lng - Longitude of the current location
      * @returns {Array} Array of objects containing lat and lng of random points
@@ -182,11 +188,6 @@
         try {
             const response = await fetch('melbourne.geojson')
             geojsonData = await response.json()
-
-            if (markers.length > 0) {
-                const centerPoint = markers[0].lngLat
-                randomPoints = generateRandomPoints(centerPoint.lat, centerPoint.lng)
-            }
         } catch (error) {
             console.error('Error loading GeoJSON data:', error)
         }
